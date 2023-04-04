@@ -28,6 +28,8 @@ This documentation is kind of "meta", as it is based on other documentations and
 4. "[Learn the Architecture](https://www.arm.com/architecture/learn-the-architecture/)"
 5. "[Arm Architecture and Processor Manuals](https://developer.arm.com/)"
 6. "[Ask development questions and find articles and blogs on specific topics from Arm experts](https://community.arm.com/)"
+7. "[Learn the architecture - AArch64 virtualization](https://developer.arm.com/documentation/102142/latest)"
+8. "[Learn the architecture - TrustZone for AArch64](https://developer.arm.com/documentation/102418/0101)"
 
 Moreover, each Arm
 

@@ -85,3 +85,5 @@ nav:
     - virtualization/index.md
   - CHERI:
     - cheri/index.md
+    - Backgrounds: cheri/backgrounds.md
+    - Capabilities: cheri/capabilities.md

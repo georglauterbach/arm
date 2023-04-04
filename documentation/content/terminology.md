@@ -27,6 +27,7 @@ When using the term _ARMv9.2-A_, you imply that your are talking about
 | Instruction Set Architecture         | ISA          |
 | Personal Technical Documentation     | PTD          |
 | Technical Reference Manual           | TRM          |
+| Undefined Behavior                   | UB           |
 | Virtual Memory System Architecture   | VMSA         |
 
 ## Technical Terms

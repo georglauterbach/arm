@@ -1,0 +1,24 @@
+name: Lint
+
+on:
+  pull_request:
+  push:
+    branches: [ master ]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Markdown
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Markdown
+        uses: nosborn/github-action-markdown-cli@v3.3.0
+        with:
+          files: documentation/content/
+          dot: true
+          config_file: .markdownlint.yaml

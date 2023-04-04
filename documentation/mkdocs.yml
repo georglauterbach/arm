@@ -1,0 +1,84 @@
+site_name: PTD | ARM
+site_description: Personal Technical Documentation about ARM
+site_author: Georg Lauterbach (@georglauterbach)
+copyright: <p>&copy <a href="https://github.com/georglauterbach"><em>Georg Lauterbach</em></a><br/><span>This project is licensed under the GNU GENERAL PUBLIC LICENSE v3.</span></p>
+docs_dir: content/
+
+repo_name: arm
+repo_url: https://github.com/georglauterbach/arm
+
+theme:
+  name: 'material'
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - navigation.tabs
+    - navigation.top
+    - navigation.expand
+    - navigation.instant
+    - navigation.tracking
+    - navigation.indexes
+    - content.code.annotate
+    - toc.follow
+  palette:
+    # Light mode
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      primary: indigo
+      accent: light blue
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    # Dark mode
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      primary: light blue
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+# Various extensions for `mkdocs` are enabled and configured here to extend supported markdown syntax/features.
+markdown_extensions:
+  - toc:
+      anchorlink: true
+  - abbr
+  - attr_list
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.magiclink
+  - pymdownx.inlinehilite
+  - pymdownx.tilde
+  - pymdownx.emoji: # https://gist.github.com/rxaviers/7360908
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.highlight:
+      extend_pygments_lang:
+        - name: yml
+          lang: yaml
+        - name: cf
+          lang: cfg
+        - name: conf
+          lang: cfg
+        - name: env
+          lang: properties
+
+# Hard-coded navigation list. Key(UI label): Value(relative filepath from `docs_dir`).
+# - If referencing a file more than once, the URLs will all point to the nav hierarchy of the last file reference entry. That usually breaks UX, try avoid it.
+# - The top-level elements are presented as tabs (due to `theme.features.navigation.tabs`).
+#   - Nested elements appear in the sidebar (left) of each tabs page.
+#   - 3rd level and beyond are automatically expanded in the sidebar instead of collapsed (due to `theme.features.navigation.expand`)
+nav:
+  - Home: index.md
+  - Terminology: terminology.md
+  - Introduction: introduction.md
+  - Hardware:
+    - hardware/index.md
+    - Registers: hardware/registers.md
+  - Virtualization:
+    - virtualization/index.md

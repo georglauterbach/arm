@@ -1,0 +1,33 @@
+name: Documentation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/docs-deployment.yml
+      - documentation/**
+
+permissions:
+      contents: write
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build with MkDocs Material via Docker
+        working-directory: documentation
+        run: ../.github/workflows/docs-build.sh
+
+      - name: 'Deploy to Github Pages'
+        uses: peaceiris/actions-gh-pages@v3.9.3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./documentation/site
+          user_name: github-actions[bot]
+          user_email: 41898282+github-actions[bot]@users.noreply.github.com

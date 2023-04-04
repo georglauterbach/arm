@@ -1,11 +1,17 @@
-site_name: PTD | ARM
-site_description: Personal Technical Documentation about ARM
+site_name: Arm Meta-Documentation
+site_description: Meta-Documentation about Arm
 site_author: Georg Lauterbach (@georglauterbach)
-copyright: <p>&copy <a href="https://github.com/georglauterbach"><em>Georg Lauterbach</em></a><br/><span>This project is licensed under the GNU GENERAL PUBLIC LICENSE v3.</span></p>
+copyright: <p>&copy <a href="https://github.com/georglauterbach"><em>Georg Lauterbach</em></a><br/><span>This project is licensed under the GNU General Public License v3.</span></p>
 docs_dir: content/
 
 repo_name: arm
 repo_url: https://github.com/georglauterbach/arm
+
+# Useful links:
+#
+# Formatting: https://squidfunk.github.io/mkdocs-material/reference/formatting/
+# Emojis: # https://gist.github.com/rxaviers/7360908
+# Admonitions: https://squidfunk.github.io/mkdocs-material/reference/admonitions/#supported-types
 
 theme:
   name: 'material'
@@ -24,8 +30,8 @@ theme:
     # Light mode
     - media: '(prefers-color-scheme: light)'
       scheme: default
-      primary: indigo
-      accent: light blue
+      primary: red
+      accent: pink
       toggle:
         icon: material/weather-night
         name: Switch to dark mode
@@ -33,7 +39,7 @@ theme:
     - media: '(prefers-color-scheme: dark)'
       scheme: slate
       primary: light blue
-      accent: indigo
+      accent: cyan
       toggle:
         icon: material/weather-sunny
         name: Switch to light mode
@@ -44,6 +50,7 @@ markdown_extensions:
       anchorlink: true
   - abbr
   - attr_list
+  - md_in_html
   - admonition
   - pymdownx.details
   - pymdownx.superfences:
@@ -53,8 +60,10 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.magiclink
   - pymdownx.inlinehilite
+  - pymdownx.caret
+  - pymdownx.mark
   - pymdownx.tilde
-  - pymdownx.emoji: # https://gist.github.com/rxaviers/7360908
+  - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
   - pymdownx.highlight:
@@ -68,17 +77,12 @@ markdown_extensions:
         - name: env
           lang: properties
 
-# Hard-coded navigation list. Key(UI label): Value(relative filepath from `docs_dir`).
-# - If referencing a file more than once, the URLs will all point to the nav hierarchy of the last file reference entry. That usually breaks UX, try avoid it.
-# - The top-level elements are presented as tabs (due to `theme.features.navigation.tabs`).
-#   - Nested elements appear in the sidebar (left) of each tabs page.
-#   - 3rd level and beyond are automatically expanded in the sidebar instead of collapsed (due to `theme.features.navigation.expand`)
 nav:
   - Home: index.md
-  - Terminology: terminology.md
   - Introduction: introduction.md
   - Hardware:
     - hardware/index.md
     - Registers: hardware/registers.md
   - Virtualization:
     - virtualization/index.md
+  - Sources: sources.md

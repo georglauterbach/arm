@@ -24,16 +24,16 @@ theme:
     # Light mode
     - media: '(prefers-color-scheme: light)'
       scheme: default
-      primary: indigo
-      accent: light blue
+      primary: red
+      accent: pink
       toggle:
         icon: material/weather-night
         name: Switch to dark mode
     # Dark mode
     - media: '(prefers-color-scheme: dark)'
       scheme: slate
-      primary: light blue
-      accent: indigo
+      primary: blue
+      accent: cyan
       toggle:
         icon: material/weather-sunny
         name: Switch to light mode
@@ -44,6 +44,7 @@ markdown_extensions:
       anchorlink: true
   - abbr
   - attr_list
+  - md_in_html
   - admonition
   - pymdownx.details
   - pymdownx.superfences:
@@ -82,3 +83,5 @@ nav:
     - Registers: hardware/registers.md
   - Virtualization:
     - virtualization/index.md
+  - CHERI:
+    - cheri/index.md

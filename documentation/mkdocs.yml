@@ -7,6 +7,12 @@ docs_dir: content/
 repo_name: arm
 repo_url: https://github.com/georglauterbach/arm
 
+# Useful links:
+#
+# Formatting: https://squidfunk.github.io/mkdocs-material/reference/formatting/
+# Emojis: # https://gist.github.com/rxaviers/7360908
+# Admonitions: https://squidfunk.github.io/mkdocs-material/reference/admonitions/#supported-types
+
 theme:
   name: 'material'
   icon:
@@ -32,7 +38,7 @@ theme:
     # Dark mode
     - media: '(prefers-color-scheme: dark)'
       scheme: slate
-      primary: blue
+      primary: light blue
       accent: cyan
       toggle:
         icon: material/weather-sunny
@@ -54,8 +60,10 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.magiclink
   - pymdownx.inlinehilite
+  - pymdownx.caret
+  - pymdownx.mark
   - pymdownx.tilde
-  - pymdownx.emoji: # https://gist.github.com/rxaviers/7360908
+  - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
   - pymdownx.highlight:
@@ -69,11 +77,6 @@ markdown_extensions:
         - name: env
           lang: properties
 
-# Hard-coded navigation list. Key(UI label): Value(relative filepath from `docs_dir`).
-# - If referencing a file more than once, the URLs will all point to the nav hierarchy of the last file reference entry. That usually breaks UX, try avoid it.
-# - The top-level elements are presented as tabs (due to `theme.features.navigation.tabs`).
-#   - Nested elements appear in the sidebar (left) of each tabs page.
-#   - 3rd level and beyond are automatically expanded in the sidebar instead of collapsed (due to `theme.features.navigation.expand`)
 nav:
   - Home: index.md
   - Terminology: terminology.md
@@ -85,5 +88,6 @@ nav:
     - virtualization/index.md
   - CHERI:
     - cheri/index.md
-    - Backgrounds: cheri/backgrounds.md
+    - Motivation: cheri/motivation.md
+    - Technical Background: cheri/technical_background.md
     - Capabilities: cheri/capabilities.md

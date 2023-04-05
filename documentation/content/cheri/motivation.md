@@ -1,4 +1,4 @@
-# Backgrounds
+# Motivation
 
 There are multiple **backgrounds and motivations** one can consider when asking: "Why do we need CHERI?". This page tries to shed some light on them.
 

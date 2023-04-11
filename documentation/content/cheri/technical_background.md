@@ -47,3 +47,49 @@ CHERI-aware code is portable across underlying architectures, except for
 - architecture-specific compiler backend code
 - machine-dependent aspects of OS kernel (e.g., early boot, context switching, exception handling)
 - user space runtime (e.g., run-time linker)
+
+### Hybrid Capability Architecture
+
+!!! info
+
+    CHERI is a hybrid capability architecture, designed to integrate a capability model with a conventional MMU-based architecture in non-disruptive and incrementally adoptable manner for software stacks.
+
+One of the key design goals of CHERI is to support the continued use of C/C++ (or alike languages) and virtual-memory-based hypervisors, operating systems, and applications.
+
+Several design choices stem from these goals, and extensions generally conform to architectural expectations:
+
+1. capabilities on MMU-enabled systems describe virtual addresses
+2. default data capability (DDC) constrains integer-relative memory accesses
+3. program-counter capability (PCC) constrains instruction fetches
+
+## Microarchitecture
+
+!!! quote
+
+    A principal design goal of the CHERI architecture has been to add new architectural primitives with only limited impact on the overall microarchitecture of contemporary processor and memory-subsystem designs.
+
+    Source: `[1]`
+
+Key challenges:
+
+1. **Tagged Memory**: conventional DRAM does not support capability tagging
+    - protection model does not require particular implementation of tagging, just that tags be suitably protected & properly coherent with the data they protect
+    - -> non-uniform distribution of capabilities -> use hierarchical tag table
+    - tag controllers and tag caches: a hierarchical page table is the best fit for most work (due to minimal overhead for DRAM)
+2. **Capability Compression**: capabilities would be 4x (not 2x) bigger
+    - capabilities consist of a series of fields of natural integer register size for the architecture
+    - 3 extra virtual addresses: bottom bound, capability address, upper bound
+    - exploit redundancy between these 4 addresses
+    - CHERI Concentrate is the current compression scheme
+3. others
+    1. increase in bus/data path width
+    2. DDC extra ADD impact on critical path
+
+Essential elements - like pipeline structure, memory subsystem designs including caches, MMUs - retain their current structure.
+
+## Software Models
+
+CHERI uses capabilities for
+
+1. **Fine-Grained Memory Protection**: of spatial, referential, and temporal memory (for memory-unsafe programming languages) by utilizing capabilities instead of integers & modest OS extensions
+2. **Scalable Software Compartmentalization**: alternative means to construct software isolation & controlled communication (not strictly MMU-based (note: MMU is used because virtual memory is used))

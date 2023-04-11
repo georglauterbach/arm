@@ -6,15 +6,15 @@ hide:
 
 # :clipboard: Terminology
 
-## Architecture, ISA, Version, Revision & More
+??? example "Architecture, ISA, Version, Revision & More"
 
-When using the term _ARMv9.2-A_, you imply that your are talking about
+    When using the term _ARMv9.2-A_, you imply that your are talking about
 
-1. the Arm architecture
-2. version 9
-3. revision 2
-4. with profile A (Application)
-5. that has the instruction sets A64 (64bit) & A32 (32bit)
+    1. the Arm architecture
+    2. version 9
+    3. revision 2
+    4. with profile A (Application)
+    5. that has the instruction sets A64 (64bit) & A32 (32bit)
 
 ## Acronyms
 

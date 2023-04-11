@@ -2,6 +2,8 @@
 
 At the core of CHERI are its capabilities. This page introduces them and explains the concepts and goals.
 
+TODO controlled non-monotonicity
+
 ## Definition
 
 !!! abstract "Definition: Capability"
@@ -46,12 +48,92 @@ Each element of a capability contributes to the protection model and is enforced
 1. **Validity Tag**: tracks the validity of a capability
     - if invalid, a capability cannot be used for load, store, instruction fetch, or other operations
     - it is still possible to extract fields from an invalid capability, including address
-    - **capability-aware instructions** maintain this tag (if desired) as caps are loaded / stored, and when capability fields are accessed, manipulated, and used – as long as the [rules for capability usage](#rules-for-capability-usage) are respected
+    - **capability-aware instructions** maintain this tag (if desired) as caps are loaded / stored, and when capability fields are accessed, manipulated, and used – as long as the [rules for capability usage](#architectural-rules-for-capability-usage) are respected
 2. **Bounds**: (lower/upper) describe the portion of the address space to which a capability authorizes loads, stores, and/or instruction fetches
+    - compressed to reduce the memory footprint
 3. **Permissions**: (mask) controls how a capability can be used
     - examples: restricting loading/storing of data and/or capabilities; prohibiting instruction fetch
 4. **Object Type**: indicates whether the capability is sealed for this object type
     - when a capability is sealed, it cannot be modified or dereferenced
     - sealed capabilities are used to implement opaque pointer types
+    - foundation of controlled [non-monotonicity](#reachable-capability-monotonicity) used to support fine-grained, in-address-space compartmentalization
 
-## Rules for Capability Usage
+## Architectural Rules for Capability Usage
+
+When capabilities are in memory, valid capabilities must be naturally aligned as that is the granularity at which in-memory tags are maintained. Partial or complete overwrites with data, rather than a complete overwrite with a valid capability, lead to the in-memory tag being cleared, preventing corrupted capabilities from later being dereferenced.
+
+### About Execution in General
+
+#### Reachable Capability Monotonicity
+
+In any execution of arbitrary code, until execution is yielded to another domain, the set of reachable capabilities (those accessible to the current program state via registers, memory, sealing, unsealing, and constructing sub-capabilities) cannot increase. I.e. it prevents new capability values with greater rights from being derived from prior capability values with fewer rights. This is an essential foundation for software compartmentalization.
+
+At boot time, the architecture provides initial capabilities to the firmware (allowing: data access & instruction fetch across full AS), and all tags are cleared in memory. Further capabilities are derived in accordance with monotonicity property (architecture -> firmware -> bootloader -> hypervisor -> OS -> application). At each stage in the derivation chain, bounds & permissions may be restricted to further limit access.
+
+There are some legitimate use cases though where monotonicity might prevent current design patterns from functioning properly:
+
+1. memory allocation: the preferred solution here is re-derivation, i.e. keep a more privileged capability and derive one more
+2. **exception handling**: when an exception is thrown, the existing architectural mechanism performs a ring transition and transfers control to a well-defined (and protected) vector; suitably privileged code also gains access to additional capability registers providing additional rights to exception handler, which may be distinct from those held by the interrupted code; this is typically used to grant exception handler access to data and further kernel capabilities
+3. **CCall to sealed capabilities**: there is a new control flow instruction `CCall`; compare two sealed operand registers, and if they have the same object type, unseal and install first capability in `%pcc`; this transfers control to a well-defined and protected vector and it grants access to additional data capability
+4. **jump to sentry capability**: similar to `CCall`, but allows domain transition to be implemented without requiring the use of exceptions or ring transitions
+
+This is known as **controlled non-monotonicity**!
+
+#### System Calls
+
+The kernel may only use capability bounds passed into a syscall. This prevents the “confused deputy” problem, where a more privileged party uses an excess of privilege when acting on behalf of a less privileged party, performing operations that were not intended to be authorized.
+
+### Single Instructions
+
+When a capability is in a register, capabilities can be used as operands to **capability-aware instructions** that inspect, manipulate, dereference, otherwise operate on capabilities. One important aspect is that **instructions expect either a capability OR an integer, they will NEVER dynamically select one** interpretation or another based on tag value!
+
+#### Capability-Aware Instructions
+
+1. **Retrieve capability fields**: retrieve integer values for various capability fields (including their tag, address, permissions, object type)
+    - generally includes conditional move and comparison instructions for certain fields to improve the density of generated code
+2. **Manipulate capability fields**: set or modify a field
+    - for various capability fields (including address, permissions, object type
+    - includes capability pointer arithmetic instructions
+    - subject to monotonicity
+3. **Load or store via capabilities**: load integer, capability, or other values via suitably authorized capability
+    - may include instructions to access data relative to the program counter capability
+4. **Control flow**: perform jump or jump-and-link-register to capability destination
+5. **Special capability registers**: retrieve and set values of special capability registers
+    - e.g. of the exception program-counter capability (`%epcc`) during exception handling
+6. **Compartmentalization**: support fast protection-domain transitions
+
+There are two important concepts to keep in mind when using capabilities with single instructions:
+
+#### Provenance Validity
+
+Valid capabilities can only be constructed by instructions that do so explicitly from other valid capabilities. This applies to capabilities in memory and in registers.
+
+#### Capability Monotonicity
+
+When an instruction constructs a new capability (except in sealed capability manipulation/exception raising), it cannot exceed permissions and bounds of the capability it was derived from.
+
+## Registers
+
+Capabilities move between registers and memory. Tags keep track of the flow of valid (uncorrupted) capabilities though the system (controlling the future use of capability values). Tagging capability registers themselves, and not just memory location, allows for the implementation of capability-oblivious code.
+
+### General-Purpose Capability Registers
+
+Capabilities can be held in
+
+1. **architectural registers** extended to hold a capability tag at the full capability data width
+2. tagged memory
+
+General-purpose capability registers can be implemented in two ways with respect to the general-purpose register file:
+
+1. **Split Capability Register File**
+    - introduces new general-purpose capability register file
+    - in style of a floating-point register file that complements existing general-purpose integer register files
+2. **Merged Capability Register File**
+    - extends existing general-purpose integer registers to include tag
+    - additional width required to hold capabilities
+
+Both of these approaches work. The differences manifest in the micro-architecture, memory footprint and software stack tradeoffs.
+
+### Special Capability Registers
+
+Some special-purpose registers require extensions (to capability width): The program counter (`%pc`) becomes the program counter capability (`%pcc`). Some entirely new capability-width special-purpose registers are required too: e.g. default data capability (`%ddc`) which automatically indirects and controls all integer-relative loads and stores, allowing non-capability-aware code to be constrained using a capability.

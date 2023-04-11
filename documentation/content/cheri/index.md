@@ -21,3 +21,6 @@ Formal modeling and verification allows making strong claims about security prop
 - slice = pointer's sandbox
 - pointers derived = equal/smaller sandbox
 - 129th bit = metadata valid bit
+- what is "capability-oblivious code"?
+- read section in `[1]` about implementation in ARMv8
+- "In addition to imposing spatial protection (bounds and permission checks) and referential protection (integrity and provenance validity enforcement), CHERI can also be used to implement strong C/C++-language temporal memory safety." what does temporal mean here?

@@ -91,4 +91,6 @@ nav:
     - Motivation: cheri/motivation.md
     - Technical Background: cheri/technical_background.md
     - Capabilities: cheri/capabilities.md
+    - Consequences: cheri/consequences.md
+    - Operating Systems: cheri/operating_systems.md
     - Sources: cheri/sources.md

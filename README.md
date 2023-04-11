@@ -13,7 +13,7 @@ This repository contains a personal documentation about ARM. The information is 
 To build and view the documentation locally, run the following command to serve the documentation on port 8000 (and make it reachable for other hosts in the network too).
 
 ```console
-$ docker run --rm -it -p 0.0.0.0:8000:8000 -v "${PWD}/documentation:/docs" docker.io/squidfunk/mkdocs-material:9.1.5
+$ docker run --rm -it -p 0.0.0.0:8080:8000 -v "${PWD}/documentation:/docs" docker.io/squidfunk/mkdocs-material:9.1.5
 INFO     -  Building documentation...
 INFO     -  Cleaning site directory
 INFO     -  Documentation built in ... seconds

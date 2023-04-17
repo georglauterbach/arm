@@ -1,11 +1,25 @@
 # Technical Background
 
 !!! quote
+
     CHERI is a hardware/software/semantics co-design project, combining architecture design, hardware implementation, adaption of mainstream software stacks, and formal semantics and proof.
+
+## TODO
+
+Insert: CHERI is a developed, evaluated, and demonstrated approach (through hardware-software prototypes) with a full software stack, including an adapted version of the Clang/LLVM compiler suite with support for capability-based C/C++, and a full UNIX-style OS (CheriBSD, based on FreeBSD) implementing **spatial, referential, and (currently for user space) non-stack temporal memory safety**.
+
+Formal modeling and verification allows making strong claims about security properties of CHERI-enabled architectures. CHERI also facilitates software mitigation techniques such as sandboxing (also defends against future (currently unknown) vulnerability classes and exploit techniques). scalable compartmentalization enables fine-grained decomposition of OS (and application) code to limit the effects of security vulnerabilities to a degree unsupportable by current architectures.
+
+CHERI addresses performance / robustness issues arising when trying to express more secure programming models (minimising privilege) above conventional architectures that provide only MMU-based protection.
+
+CHERI is built upon C [fat-pointer][stackoverflow-fat-pointers] literature.
+
+[stackoverflow-fat-pointers]: https://stackoverflow.com/questions/57754901/what-is-a-fat-pointer
 
 ## Memory Safety
 
 !!! abstract "Definition: Memory Safety"
+
     Memory safety is the property of a program where memory pointers used always point to valid memory, i.e. allocated and of the correct type/size. Memory safety is a correctness issue – a memory unsafe program may crash or produce nondeterministic output depending on the bug.
 
     [Source](https://stanford-cs242.github.io/f18/lectures/05-1-rust-memory-safety.html)
@@ -16,12 +30,57 @@ CHERI's new memory protection features allow memory-unsafe programming languages
 
 ## The CHERI Architecture
 
-CHERI is a - **hybrid capability architecture extension** able to blend architectural capabilities with conventional MMU-based architectures and microarchitectures and with conventional CPU stacks based on virtual memory and C/C++.
+CHERI is a **_hybrid_ capability architecture extension** (based on the [_Capsicum_ security model][wikipedia-capsicum]) able to blend architectural capabilities with conventional MMU-based architectures and microarchitectures and with conventional CPU stacks based on virtual memory and C/C++.
 
-!!! note
+!!! note "Incremental Adoptibility"
+
     This approach allows incremental deployment within existing ecosystems.
 
 CHERI **extends conventional ISAs** which use machine words to represent language-level integers and pointers with a new type of hardware-supported data: the [**architectural capability**][docs-capabilities]!
+
+CHERI provides an architecture-neutral capability-based protection model, instantiated in various commodity base architectures (such as CHERI-MIPS, CHERI-RISC-V, Arm’s prototype _Morello_ architecture, and a sketched version of CHERI-x86-64).
+
+This enables software to efficiently implement fine-grained memory protection and scalable software compartmentalization.
+
+By providing strong, non-probabilistic, efficient mechanisms to support the principles of least privilege (POLA) and intentional use in the execution of software at multiple levels of abstraction, one can also prevent and mitigate vulnerabilities.
+
+[wikipedia-capsicum]: https://en.wikipedia.org/wiki/Capsicum_(Unix)
+
+## Design Goals
+
+1. Fine-Grained Memory Protection
+2. Highly Scalable Software Compartmentalization
+3. Incremental Adoptability from Current ISAs & Software Stacks
+    - no disruption of RISC design choices
+    - composed with conventional ring-based privilege & virtual memory
+4. Low Performance Overhead for Memory Protection
+5. Significant Performance Improvements for Software Compartmentalization
+6. Formal Grounding
+7. Programmer-Friendly Underpinnings
+
+## Minimizing Privilege
+
+CHERI allows software privilege to be minimized at two granularities:
+
+1. **Fine-Grained Code Protection**
+    - enables fine-grain protection and intentional use
+    - by introducing in-address-space _memory_ capabilities replacing integer virtual addresses representations of code & data pointers
+    - aim: minimize rights available to be exercised on instruction-by-instruction basis
+    - protection policies can (to a large extent) be based on information already present in program descriptions
+    - POLA
+    - non-probabilistic protection against broad range of memory- and pointer-based vulnerabilities & exploit techniques
+        - buffer overflows
+        - format-string attacks
+        - pointer injection
+        - data-pointer-corruption attacks
+        - control-flow attacks
+    - achieved through code re-compilation on CHERI
+2. **Secure Encapsulation & Intentional Use**
+   - coarser granularity
+   - through highly scalable in-address-space software compartmentalization
+   - by implementing _object_ capabilities
+   - aim: minimize set of rights available to larger isolated software components, building on efficient architectural support for strong software encapsulation
+   - grounded in explicit descriptions of isolation and communication
 
 ### Already Developed
 

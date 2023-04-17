@@ -66,3 +66,28 @@ Several software stacks developed and/or adjusted:
 2. CHERI GDB
 3. CHERI microkernel (interesting!)
 4. CheriBSD kernel + CheriBSD hybrid/CheriABI user space + CheriBSD applications
+
+!!! quote "CAP-VMs: Capability-Based Isolation and Sharing in the Cloud"
+
+    We ask the question “if the hardware supported dynamic, low-overhead sharing of arbitrary-sized memory regions between otherwise isolated regions, how would this impact the cloud stack design?” We exploit hardware support for memory capabilities [23, 70], which impose flexible bounds on all memory accesses, allowing components to be isolated without page table modifications or adherence to page boundaries.
+
+### _Morello_
+
+- extends the ARMv8.2-A architecture (execution state `aarch64` only)
+- implements 129 Bit CHERI capabilities
+
+| Instruction      | Permission                                      |
+| :--------------- | :---------------------------------------------- |
+| Load             | Load from memory                                |
+| Store            | Store to memory                                 |
+| Execute          | Execute instructions                            |
+| LoadCap          | Load a valid cap to a cap register              |
+| StoreCap         | Store a valid cap from a cap register           |
+| StoreLocalCap    | Store a local capability to memory              |
+| Seal             | Seal an unsealed capability                     |
+| Unseal           | Unseal sealed capability                        |
+| System           | Access system registers and instructions (1)    |
+| BranchSealedPair | Use in an unsealing branch                      |
+| CompartmentID    | Use as a compartment ID                         |
+| MutableLoad      | Load to a cap register with mutable permissions |
+| User\[N\]        | Software-defined permissions                    |

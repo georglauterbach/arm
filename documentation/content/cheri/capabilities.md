@@ -4,15 +4,26 @@ At the core of CHERI are its capabilities. This page introduces them and explain
 
 TODO controlled non-monotonicity
 
+!!! quote
+
+    CHERI blends traditional paged virtual memory with an in-AS capability model that includes capability values in registers, capability instructions, and tagged memory to enforce capability integrity.
+
+    [Source][cheri-isa-specification]
+
 ## Definition
 
 !!! abstract "Definition: Capability"
-    ~ unforgeable tokens of authority, used to implement
+
+    ~ unforgeable and delegable tokens of authority, used to implement
 
     - explicit pointers (declared in the language);
     - implied pointers (used by runtime and generated code) (e.g. in C for memory protection to directly mitigate a broad range of known vulnerability types & exploit techniques).
 
-    Capabilities are hardware-supported descriptions of permissions that can be used, in place of integer addresses, to refer to data, code, and objects in protected ways.
+    Capabilities can describe fine-grained regions of memory, and can be substituted for data or code pointers in generated code, protecting data and improving control-flow robustness.
+
+    Capabilities are hardware-supported descriptions of permissions that can be used, in place of integer addresses, to refer to data, code, and objects in protected ways. Basically, they are pointers tagged with extra metadata that the hardware maintains and validates.
+
+    Breaking out of the sandbox causes the hardware to throw an exception.
 
 ## Description
 
@@ -29,7 +40,16 @@ The authoritative architecture reference is the [**CHERI ISA Specification**][ch
 
 [cheri-isa-specification]: https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-951.pdf
 
-## Visualization
+## Memory vs. Object Capabilities
+
+Vulnerability mitigation is achieved through two capability-based techniques aimed at user-level C-language TCBs:
+
+1. **Memory Capabilities**: implemented by the ISA and compiler, providing an incrementally deployable replacement for pointers within address spaces, mitigating memory-based exploits
+2. **Object Capabilities**: implemented by the operating system over the memory-capability foundation, providing scalable, and likewise incrementally adoptable, software compartmentalization
+
+## Memory Capabilities
+
+### Visualization
 
 ![A Capability Visualized](../images/cheri/capability.png){ loading=lazy }
 
@@ -41,16 +61,20 @@ Capabilities are twice (actually 2x + 1) the width of native integer pointer typ
 
 The validity tag is maintained in registers and in memory by the architecture.
 
-## Components
+### Components
 
 Each element of a capability contributes to the protection model and is enforced by hardware. The elements are:
 
 1. **Validity Tag**: tracks the validity of a capability
+    - 129th Bit
     - if invalid, a capability cannot be used for load, store, instruction fetch, or other operations
     - it is still possible to extract fields from an invalid capability, including address
     - **capability-aware instructions** maintain this tag (if desired) as caps are loaded / stored, and when capability fields are accessed, manipulated, and used – as long as the [rules for capability usage](#architectural-rules-for-capability-usage) are respected
 2. **Bounds**: (lower/upper) describe the portion of the address space to which a capability authorizes loads, stores, and/or instruction fetches
     - compressed to reduce the memory footprint
+    - provide compromise between memory consumption & bounds precision
+    - sometimes also called **Slice**
+    - basically the pointer's sandbox
 3. **Permissions**: (mask) controls how a capability can be used
     - examples: restricting loading/storing of data and/or capabilities; prohibiting instruction fetch
 4. **Object Type**: indicates whether the capability is sealed for this object type
@@ -58,13 +82,13 @@ Each element of a capability contributes to the protection model and is enforced
     - sealed capabilities are used to implement opaque pointer types
     - foundation of controlled [non-monotonicity](#reachable-capability-monotonicity) used to support fine-grained, in-address-space compartmentalization
 
-## Architectural Rules for Capability Usage
+### Architectural Rules for Capability Usage
 
 When capabilities are in memory, valid capabilities must be naturally aligned as that is the granularity at which in-memory tags are maintained. Partial or complete overwrites with data, rather than a complete overwrite with a valid capability, lead to the in-memory tag being cleared, preventing corrupted capabilities from later being dereferenced.
 
-### About Execution in General
+#### About Execution in General
 
-#### Reachable Capability Monotonicity
+##### Reachable Capability Monotonicity
 
 In any execution of arbitrary code, until execution is yielded to another domain, the set of reachable capabilities (those accessible to the current program state via registers, memory, sealing, unsealing, and constructing sub-capabilities) cannot increase. I.e. it prevents new capability values with greater rights from being derived from prior capability values with fewer rights. This is an essential foundation for software compartmentalization.
 
@@ -79,15 +103,25 @@ There are some legitimate use cases though where monotonicity might prevent curr
 
 This is known as **controlled non-monotonicity**!
 
-#### System Calls
+##### System Calls
 
 The kernel may only use capability bounds passed into a syscall. This prevents the “confused deputy” problem, where a more privileged party uses an excess of privilege when acting on behalf of a less privileged party, performing operations that were not intended to be authorized.
 
-### Single Instructions
+#### Protection
+
+TODO
+
+CHERI protects capabilities by enforcing three properties:
+
+1. **Provenance Validity**: ensures that a capability can only be derived (constructed) from another valid capability, i.e., it is not possible to cast an arbitrary byte sequence to a capability.
+2. **Capability Integrity**: capabilities stored in memory cannot be modified, which CHERI achieves through _transparent memory tagging_ (CLARIFY).
+3. **Capability Monotonicity**: requires that, if a capability is stored in a register, its bounds and permissions can only be reduced, e.g., a read-only capability cannot be turned into a read-write one.
+
+#### Single Instructions
 
 When a capability is in a register, capabilities can be used as operands to **capability-aware instructions** that inspect, manipulate, dereference, otherwise operate on capabilities. One important aspect is that **instructions expect either a capability OR an integer, they will NEVER dynamically select one** interpretation or another based on tag value!
 
-#### Capability-Aware Instructions
+##### Capability-Aware Instructions
 
 1. **Retrieve capability fields**: retrieve integer values for various capability fields (including their tag, address, permissions, object type)
     - generally includes conditional move and comparison instructions for certain fields to improve the density of generated code
@@ -104,19 +138,19 @@ When a capability is in a register, capabilities can be used as operands to **ca
 
 There are two important concepts to keep in mind when using capabilities with single instructions:
 
-#### Provenance Validity
+##### Provenance Validity
 
 Valid capabilities can only be constructed by instructions that do so explicitly from other valid capabilities. This applies to capabilities in memory and in registers.
 
-#### Capability Monotonicity
+##### Capability Monotonicity
 
 When an instruction constructs a new capability (except in sealed capability manipulation/exception raising), it cannot exceed permissions and bounds of the capability it was derived from.
 
-## Registers
+### Registers
 
 Capabilities move between registers and memory. Tags keep track of the flow of valid (uncorrupted) capabilities though the system (controlling the future use of capability values). Tagging capability registers themselves, and not just memory location, allows for the implementation of capability-oblivious code.
 
-### General-Purpose Capability Registers
+#### General-Purpose Capability Registers
 
 Capabilities can be held in
 
@@ -134,6 +168,30 @@ General-purpose capability registers can be implemented in two ways with respect
 
 Both of these approaches work. The differences manifest in the micro-architecture, memory footprint and software stack tradeoffs.
 
-### Special Capability Registers
+#### Special Capability Registers
 
 Some special-purpose registers require extensions (to capability width): The program counter (`%pc`) becomes the program counter capability (`%pcc`). Some entirely new capability-width special-purpose registers are required too: e.g. default data capability (`%ddc`) which automatically indirects and controls all integer-relative loads and stores, allowing non-capability-aware code to be constrained using a capability.
+
+## Object Capabilities
+
+With object capabilities, we decompose applications into isolated components, each granted only the rights it requires to operate. The compartmentalization granularity determines the degree of program decomposition - the more fine-grained. the better the mitigation against vulnerabilities due to POLA.
+
+!!! quote
+
+    The clean separation of policy and mechanism in object-capability systems aligns elegantly with the RISC philosophy: with fine-grained protection “fast paths” implemented in hardware, policy definition can be left to the OS, compiler, and application.
+
+    Source: `[3]`
+
+The object capability model is implemented by the kernel and user space runtime, and supported by the ISA and the compiler-directed memory protection. Object encapsulation is a model for isolation, object invocation a means for controlled communication. Capability-based protection therefore implements encapsulation.
+
+A kernel could then implement object invocations via hardware-accelerated domain transitions.
+
+!!! quote
+
+    CHERI supports efficient, synchronous domain switching modeled on function invocation rather than asynchronous inter-process message passing. This enables the obvious compartmentalization strategy to “cut” applications at function-call boundaries (e.g., library APIs).
+
+    Source: `[3]`
+
+## Pure-Capability-Systems vs. Hybrid Systems
+
+In pure-capability-systems, everything is accessible only an associated capability. Hybrid capability systems relax this restriction by also allowing some _ambient authority_ (i.e. the ability to access arbitrary system objects).

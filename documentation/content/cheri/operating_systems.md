@@ -1,5 +1,7 @@
 # CHERI for Operating Systems
 
+OS-hardening is difficult and complex. Even with many techniques, there are still many security vulnerabilities, as many techniques are too coarse grained.
+
 ## Design Goals
 
 Several design goals have been proposed:

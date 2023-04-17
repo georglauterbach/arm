@@ -1,14 +1,10 @@
 # Motivation
 
-There are multiple **backgrounds and motivations** to consider when asking: "Why do we need CHERI?". This page tries to shed some light on them.
+There are multiple backgrounds and motivations one can consider when asking: "Why do we need CHERI?". This page tries to shed some light on them.
 
-## Strong Memory Protection (& Scalable Software Compartmentalization)
+## Software Fault Isolation & Strong Memory Protection
 
-!!! warning "This Section is Work in Progress"
-
-Current ISAs, and software based on such architectures, use virtual memory as a mechanism for memory protection and isolation. While this approach is widely and very successfully deployed, it has inherent limitations. Not only is the granularity at which memory is allocated bound to the page size, and with it the access control to this memory, but it can also impose substantial scalability limits on a large set of communicating processes due to its usage of dedicated address spaces.
-
-CHERI **extends conventional processor ISAs with architectural capabilities to enable fine-grained memory protection and highly scalable software compartmentalization (= privilege separation)**. A **hybrid capability-system** approach allows architectural capabilities to be integrated cleanly with contemporary RISC architectures & microarchitectures, as well as with MMU-based C/C++- language software stacks. As a consequence, CHERI should be able to eliminate some of the shortcomings of virtual memory.
+!!! note "This is by far the most prominant reason for the existence of CHERI."
 
 !!! quote
 
@@ -16,7 +12,9 @@ CHERI **extends conventional processor ISAs with architectural capabilities to e
 
     Source: `[3]`
 
-Capability-based systems implement the _Principle of Least Authority_ (POLA).
+Current ISAs, and software based on such architectures, use virtual memory as a mechanism for memory protection and isolation. While this approach is widely and very successfully deployed, it has inherent limitations. Not only is the granularity at which memory is allocated bound to the page size, and with it the access control to this memory, but it can also impose substantial scalability limits on a large set of communicating processes due to its usage of dedicated address spaces.
+
+Capability-based systems, like CHERI, implement the _Principle of Least Authority_ (POLA). This is desirable as POLA overcomes such limitations.
 
 ## Rust's Unsafe Pointers
 

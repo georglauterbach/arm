@@ -91,3 +91,7 @@ Several software stacks developed and/or adjusted:
 | CompartmentID    | Use as a compartment ID                         |
 | MutableLoad      | Load to a cap register with mutable permissions |
 | User\[N\]        | Software-defined permissions                    |
+
+## Sandboxing - Protection Against Exploits
+
+CHERI also facilitates software mitigation techniques such as sandboxing, which also defends against future (currently unknown) vulnerability classes and exploit techniques.

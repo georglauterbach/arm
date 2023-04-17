@@ -2,6 +2,8 @@
 
 OS-hardening is difficult and complex. Even with many techniques, there are still many security vulnerabilities, as many techniques are too coarse grained.
 
+Scalable compartmentalization enables fine-grained decomposition of OS (and application) code to limit the effects of security vulnerabilities to a degree unsupportable by current architectures.
+
 ## Design Goals
 
 Several design goals have been proposed:

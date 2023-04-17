@@ -1,12 +1,10 @@
 # Capabilities
 
-At the core of CHERI are its capabilities. This page introduces them and explains the concepts and goals.
-
-TODO controlled non-monotonicity
+At the core of CHERI are its capabilities. This page introduces them and explains concepts and goals.
 
 !!! quote
 
-    CHERI blends traditional paged virtual memory with an in-AS capability model that includes capability values in registers, capability instructions, and tagged memory to enforce capability integrity.
+    CHERI blends traditional paged virtual memory with an in-address-space capability model that includes capability values in registers, capability instructions, and tagged memory to enforce capability integrity.
 
     [Source][cheri-isa-specification]
 
@@ -94,6 +92,8 @@ In any execution of arbitrary code, until execution is yielded to another domain
 
 At boot time, the architecture provides initial capabilities to the firmware (allowing: data access & instruction fetch across full AS), and all tags are cleared in memory. Further capabilities are derived in accordance with monotonicity property (architecture -> firmware -> bootloader -> hypervisor -> OS -> application). At each stage in the derivation chain, bounds & permissions may be restricted to further limit access.
 
+##### Controlled Non-Monotonicity
+
 There are some legitimate use cases though where monotonicity might prevent current design patterns from functioning properly:
 
 1. memory allocation: the preferred solution here is re-derivation, i.e. keep a more privileged capability and derive one more
@@ -101,20 +101,16 @@ There are some legitimate use cases though where monotonicity might prevent curr
 3. **CCall to sealed capabilities**: there is a new control flow instruction `CCall`; compare two sealed operand registers, and if they have the same object type, unseal and install first capability in `%pcc`; this transfers control to a well-defined and protected vector and it grants access to additional data capability
 4. **jump to sentry capability**: similar to `CCall`, but allows domain transition to be implemented without requiring the use of exceptions or ring transitions
 
-This is known as **controlled non-monotonicity**!
-
 ##### System Calls
 
 The kernel may only use capability bounds passed into a syscall. This prevents the “confused deputy” problem, where a more privileged party uses an excess of privilege when acting on behalf of a less privileged party, performing operations that were not intended to be authorized.
 
 #### Protection
 
-TODO
-
 CHERI protects capabilities by enforcing three properties:
 
 1. **Provenance Validity**: ensures that a capability can only be derived (constructed) from another valid capability, i.e., it is not possible to cast an arbitrary byte sequence to a capability.
-2. **Capability Integrity**: capabilities stored in memory cannot be modified, which CHERI achieves through _transparent memory tagging_ (CLARIFY).
+2. **Capability Integrity**: capabilities stored in memory cannot be modified, which CHERI achieves through transparent memory tagging (i.e. automatically taking care of the validity tag, clearing it if necessary - and doing so in a mannger that is transparent to software).
 3. **Capability Monotonicity**: requires that, if a capability is stored in a register, its bounds and permissions can only be reduced, e.g., a read-only capability cannot be turned into a read-write one.
 
 #### Single Instructions

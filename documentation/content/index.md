@@ -18,14 +18,13 @@ This is a personal documentation about ARM. The information is mostly taken from
 
     This documentation is a "meta-documentation" as it is based on other documentations and sources. Here are a few of them:
 
-    1. [Understanding the Arm Developer Documentation](https://developer.arm.com/documentation/102404/0201/Understanding-Arm-documentation?lang=en)
-    2. [Arm Documentation - Introduction](https://developer.arm.com/documentation/102404/0201?lang=en)
-    3. [Arm Documentation - Exception Model](https://developer.arm.com/documentation/102412/0103)
-    4. [Learn the Architecture](https://www.arm.com/architecture/learn-the-architecture/)
-    5. [Arm Architecture and Processor Manuals](https://developer.arm.com/)
-    6. [Ask development questions and find articles and blogs on specific topics from Arm experts](https://community.arm.com/)
-    7. [Learn the architecture - AArch64 virtualization](https://developer.arm.com/documentation/102142/latest)
-    8. [Learn the architecture - TrustZone for AArch64](https://developer.arm.com/documentation/102418/0101)
+    1. [Ask development questions and find articles and blogs on specific topics from Arm experts](https://community.arm.com/)
+    3. [Arm Architecture and Processor Manuals](https://developer.arm.com/)
+    4. [Arm Docs - LtA - Introducing the Arm Architecture](https://developer.arm.com/documentation/102404/0201?lang=en)
+    5. [Arm Docs - LtA - Guides](https://www.arm.com/architecture/learn-the-architecture/)
+    6. [Arm Docs - LtA - Exception Model](https://developer.arm.com/documentation/102412/0103)
+    7. [Arm Docs - LtA - AArch64 Virtualization](https://developer.arm.com/documentation/102142/latest)
+    8. [Arm Docs - LtA - TrustZone for AArch64](https://developer.arm.com/documentation/102418/0101)
 
     Moreover, each Arm
 

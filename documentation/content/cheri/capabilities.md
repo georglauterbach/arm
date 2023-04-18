@@ -17,6 +17,8 @@ Vulnerability mitigation is achieved through two capability-based techniques aim
 1. **Memory Capabilities**: implemented by the ISA and compiler, providing an incrementally deployable replacement for pointers within address spaces, mitigating memory-based exploits
 2. **Object Capabilities**: implemented by the operating system over the memory-capability foundation, providing scalable, and likewise incrementally adoptable, software compartmentalization
 
+In pure-capability-systems, everything is accessible only an associated capability. Hybrid capability systems relax this restriction by also allowing some _ambient authority_ (i.e. the ability to access arbitrary system objects).
+
 ## Memory Capabilities
 
 ### Description
@@ -207,7 +209,3 @@ A kernel could then implement object invocations via hardware-accelerated domain
     CHERI supports efficient, synchronous domain switching modeled on function invocation rather than asynchronous inter-process message passing. This enables the obvious compartmentalization strategy to “cut” applications at function-call boundaries (e.g., library APIs).
 
     Source: `[3]`
-
-## Pure-Capability-Systems vs. Hybrid Systems
-
-In pure-capability-systems, everything is accessible only an associated capability. Hybrid capability systems relax this restriction by also allowing some _ambient authority_ (i.e. the ability to access arbitrary system objects).

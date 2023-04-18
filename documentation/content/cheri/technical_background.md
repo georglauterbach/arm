@@ -8,6 +8,10 @@
 
 CHERI extends conventional processor ISAs with architectural capabilities to enable fine-grained memory protection and highly scalable software compartmentalization.
 
+The authoritative architecture reference is the [**CHERI ISA Specification**][cheri-isa-specification]. It describes the overall research approach, architecture-neutral protection model, mappings into \[...\] 32/64-bit RISC-V architectures and it provides a detailed design rationale for a number of key CHERI design choices.
+
+[cheri-isa-specification]: https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-951.pdf
+
 ## The CHERI Architecture
 
 CHERI is a **_hybrid_ capability architecture extension** (based on the [_Capsicum_ security model][wikipedia-capsicum]) able to cleanly integrate architectural capabilities with conventional MMU-based RISC (micro-)architectures.

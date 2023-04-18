@@ -76,22 +76,6 @@ Several software stacks developed and/or adjusted:
 - extends the ARMv8.2-A architecture (execution state `aarch64` only)
 - implements 129 Bit CHERI capabilities
 
-| Instruction      | Permission                                      |
-| :--------------- | :---------------------------------------------- |
-| Load             | Load from memory                                |
-| Store            | Store to memory                                 |
-| Execute          | Execute instructions                            |
-| LoadCap          | Load a valid cap to a cap register              |
-| StoreCap         | Store a valid cap from a cap register           |
-| StoreLocalCap    | Store a local capability to memory              |
-| Seal             | Seal an unsealed capability                     |
-| Unseal           | Unseal sealed capability                        |
-| System           | Access system registers and instructions (1)    |
-| BranchSealedPair | Use in an unsealing branch                      |
-| CompartmentID    | Use as a compartment ID                         |
-| MutableLoad      | Load to a cap register with mutable permissions |
-| User\[N\]        | Software-defined permissions                    |
-
 ## Sandboxing - Protection Against Exploits
 
 CHERI also facilitates software mitigation techniques such as sandboxing, which also defends against future (currently unknown) vulnerability classes and exploit techniques.

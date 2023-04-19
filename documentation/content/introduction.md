@@ -199,6 +199,8 @@ Physical interrupts include:
 
 ### Handling Exceptions
 
+#### General Information on Handling Exceptions
+
 In AArch64 specific terminology is used when talking about taking an exception:
 
 - When the PE responds to an exception, an exception is¢ taken.
@@ -290,3 +292,258 @@ EL0/EL1 translations can also be tagged with a Virtual Machine Identifier (VMID)
 ## Instruction Set Architecture (ISA)
 
 The Arm ISA allows you to write software and firmware that conforms to the Arm specifications. This mean that, if your software or firmware conforms to the specifications, any Arm-based processor will execute it in the same way.
+
+The 64-bit Armv8-A architecture, also known as AArch64, runs the A64 instruction set. All instructions are detailed in the [Arm Architecture Reference Manual]. Every Arm Architecture Reference Manual provides a detailed description of each instruction, including:
+
+- Encoding - the representation of the instruction in memory.
+- Arguments - inputs to the instruction.
+- Pseudocode - what the instruction does, as expressed in Arm pseudocode language.
+- Restrictions - when the instruction cannot be used, or the exceptions it can trigger.
+
+[Arm Architecture Reference Manual]: https://developer.arm.com/documentation/ddi0487/latest/
+
+### Sequential Execution Model
+
+The Arm architecture describes instructions following a Simple Sequential Execution (SSE) model. This means that the processor behaves as if the processor fetched, decoded and executed one instruction at a time, and in the order in which the instructions appeared in memory. In practice, modern processors have pipelines that can execute multiple instructions at once, and may do so out of order. This diagram shows an example pipeline for an Arm Cortex processor:
+
+![ISA SSE](images/introduction/isa-sse.jpeg)
+
+The architecture is a functional description. This means that it does not specify how an individual processor works. Each processor must behave consistently with the simple sequential execution model, even if it is reordering instructions internally.
+
+### Registers
+
+#### General-Purpose Registers
+
+The architecture provides 31 general purpose registers. Each register can be used as a 64-bit `X` (extended) register (`X0`..`X30`), or as a 32-bit `W` (word) register (`W0`..`W30`). When a `W` register is written, as seen in the example above, the top 32 bits of the 64-bit register are zeroed.
+
+There is a separate set of 32 registers used for floating point and vector operations. These registers are 128-bit, but like the general-purpose registers, can be accessed in several ways: `Bx` (byte) is 8 bits, `Hx` (halfword) is 16 bits, `Sx` (single) is 32 bits, `Dx` (double) is 64 bites and `Qx` (quad) which is 128 bits. These registers can also be referred to as `V` registers. When the `V` form is used, the register is treated as being a vector. This means that it is treated as though it contains multiple independent values, instead of a single value.
+
+#### Other Registers
+
+- the zero registers, `XZR` and `WZR`, always read as 0 and ignore writes
+- `X30` is used as the Link Register and can be referred to as `LR`; separate registers, `ELR_ELx`, are used for returning from exceptions
+- the Program Counter (`PC`) is not a general-purpose register in A64
+    - it cannot be used with data processing instructions
+    - PC can be read using `ADR Xd, .`
+- you can use the stack pointer (`SP`) as the base address for loads and stores
+    - you can also use the stack pointer with a limited set of data-processing instructions, but it is not a regular general purpose register
+    - Armv8-A has multiple stack pointers, and each one is associated with a specific Exception level
+    - when SP is used in an instruction, it means the current stack pointer
+
+!!! danger "Remember that in AArch64 the stack pointer (`SP`) must be 128-bit aligned!"
+
+#### System Registers
+
+As well as general purpose registers, the architecture defines system registers. System registers are used to configure the processor and to control systems such as the MMU and exception handling. System registers cannot be used directly by data processing or load/store instructions. Instead, the contents of a system register need to be read into an X register, operated on, and then written back to the system register. There are two specialist instructions for accessing system registers:
+
+```asm
+# read the system register into Xd
+MRS Xd, <system register>
+
+# write Xn to the system regsiter
+MSR <system register>, Xn
+
+# System registers are specified by name:
+# read SCTLR_EL1 into X0
+MRS X0, SCTLR_EL1
+```
+
+System register names end with `_ELx` which specifies the minimum privilege necessary to access the register.
+
+!!! note
+
+    Sometimes you will see `_EL12` or `_EL01`. These are used as part of virtualization. Refer to the guide on virtualization for more information.
+
+### Instructions
+
+#### Data Processing
+
+Assembly instructions follow a basic format:
+
+```asm
+<SYMBOL>:
+  (F)<OPARATION>(S) <DESTINATION REGISTER>, <INPUT REGISTER>, <INPUT REGISTER or CONSTANT>  (, <INPUT REGISTER>) (, <EXTRA FLAGS>)
+```
+
+- an `F` can be prepended to the opration to use floating point operations (and operands)
+- an `S` can be appended to the operation to set flags (e.g., for the ALU)
+- adding extra flags (like `SXTH` (sign-extend) to `ADD`) will cause the instruction to behave slightly differently
+- DESTINATION is always a register
+- operand 1 will always be a register
+
+There are some special instructions:
+
+1. `MOV` moves a constant, or the contents of another register, into the register specified as the destination
+2. `MVN` is like a copy, but "negative"
+
+#### Loads & Stores
+
+##### General Information on Loads & Stores
+
+The basic load and store operations are: `LDR` (load) and `STR` (store). These operations transfer a single value between memory and the general-purpose registers. The syntax for these instructions is:
+
+```asm
+LDR<Sign><Size>    <Destination>, [<address>]
+STR<Size>          <Destination>, [<address>]
+```
+
+The size of the load or store is determined by the register type `X` or `W` and the Size field. With `S`, the value is sign-extended to the register size chosen.
+
+##### Addressing
+
+There are several addressing modes that define how the address is formed.
+
+1. Base Register
+    - the simplest form of addressing is a single register
+    - the base register is an `X` register that contains the full, or absolute, virtual address of the data being accessed
+    - example: `LDRR W0, [X1]`
+2. Offset Addressing
+    - like 1., but an offset can be applied optionally to the base address
+    - example: `LDR W0, [X1, #12]`
+    - the offset can be either a constant or another register
+    - might be used for `struct`s
+3. Pre-Index Addressing
+    - like offset addressing, except that the base pointer is updated as a result of the instruction
+    - example: `LDR W0, [X1, #12]!` (this is like `LDR W0, [X1, #12] ; ADD X1, X1, #12 ;`)
+4. Post-Index Addressing
+    - value is loaded from the address in the base pointer, and then the pointer is updated
+    - example: `LDR W0, [X1], #12` (this is like `LDR W0, [X1] ; ADD X1, X1, #12 ;`)
+    - useful for popping off the stack
+
+##### Using Pairs
+
+A64 also has load (`LDP`) and store pair (`STP`) instructions. These pair instructions transfer two registers to and from memory. Load and store pair instructions are often used for pushing, and popping off the stack.
+
+??? example
+
+    This instruction loads `[X0]` into `W3`, and loads `[X0 + 4]` into `W7`:
+
+    ```asm
+    LDP   W3, W7, [X0]
+    ```
+
+    This instruction pushes `X0` and `X1` onto the stack (`#-16` is the immediate value -16):
+
+    ```asm
+    STP   X0, X1, [SP, #-16]!
+    ```
+
+##### Specialist Instructions
+
+These are load and stores instructions with implicit memory barriers. Armv8.7-A and Armv9.2-A add support for a 64-byte atomic load (`LD64B`) instruction and three store (`ST64Bx`) instructions are added to the architecture.
+
+The `memcpy()`/`memset()` family of functions are widely used across many workloads. It is therefore important that they run as efficiently as possible. To enable a standard optimized implementation of these functions, which will be efficient across different processor implementations, A64 includes the `CPYx` and `SETx` instructions.
+
+### Program Flow
+
+Ordinarily, a processor executes instructions in program order. This means that a processor executes instructions in the same order that they are set in memory. One way to change this order is to use branch instructions. Branch instructions change the program flow and are used for loops, decisions and function calls.
+
+The A64 instruction set also has some conditional branch instructions. These are instructions that change the way they execute, based on the results of previous instructions.
+
+!!! tip
+
+    Armv8.3-A and Armv8.5-A introduced instructions to protect against return-oriented programming and jump-oriented programming.
+
+#### Loops & Decisions
+
+There are two types of branch instructions: unconditional and conditional.
+
+##### Unconditional Branch Instructions
+
+There are two types of unconditional branch instructions:
+
+1. `B <label>` which means Branch
+    - performs a direct, PC-relative, branch to `<label>`
+    - offset from the current PC to the destination is encoded within the instruction
+    - range is limited by the space available within the instruction to record the offset and is +/-128MB
+2. `BR <Xn>` which means Branch with Register
+    - performs an indirect, or absolute, branch to the address specified in `Xn`
+
+##### Conditional Branch Instructions
+
+The conditional branch instruction `<x>B.<cond> <label>` is the conditional version of the `B` instruction. The branch is only taken if the condition `<cond>` is true. The range is limited to +/-1MB. The condition is tested against the ALU flags stored in `PSTATE` and needs to be generated by a previous instruction such as a compare (`CMP`).
+
+##### Generating Condition Code & Conditional Selects
+
+ALU flags are set as a side effect of data-processing instructions. To recap, an `S` at the end of `<OPERATION>` causes the ALU flags to be updated. ALU flags are: `N` for negative, `C` for carry, `V` for overflow and `Z` for zero. For example, the condition code (`<cond>`) for equal (`EQ`) check for `Z==1`.
+
+In addition to the regular data-processing instructions, other instructions are available that only update the ALU flags:
+
+```asm
+# compare, an alias of SUBS XZR, X0, X7
+CMP X0, X7
+# test, an alias of ANDS WZR, W5, #1
+TST W5, #1
+```
+
+So far, we have seen examples that use branches to handle decisions. The A64 instruction set also provides conditional select instructions. In many cases, these instructions can be used as an alternative to branches. There are many variants, but the basic form is:
+
+```asm
+CSEL Xd, Xn, Xm, cond
+```
+
+!!! tip
+
+    Importantly, conditional selects also remove the need to branch. In modern processors, this kind of branch can be difficult for the branch prediction logic to predict correctly. A mispredicted branch can have a negative effect on performance, it is better that you remove branches where possible.
+
+#### Function Calls
+
+When calling a function or sub-routine, we need a way to get back to the caller when finished. Adding an `L` to the `B` or `BR` instructions turns them into a branch with link. This means that a return address is written into `LR` (the link register, i.e. `X30`) as part of the branch.
+
+There is a specialist function return instruction, `RET`. This performs an indirect branch to the address in the link register.
+
+??? Info "Direct vs Indirect Branching"
+
+    Direct branch (DB) is an instruction which explicitly includes the jump destination address (in full, or as an offset from a register) in the body of the instruction. An indirect branch (IB) is an instruction that includes a pointer to a memory address, which in turn contains the jump destination address.
+
+??? question "Why Do We Need `RET`?"
+
+    Why do we need a special function return instruction? Functionally, BR LR would do the same job as RET. Using RET tells the processor that this is a function return. Most modern processors, and all Cortex-A processors, support branch prediction. Knowing that this is a function return allows processors to more accurately predict the branch.
+
+A function call might then look like this:
+
+```asm
+.type foo, @function
+bar:
+    BL foo # call function foo
+    ...
+
+.global foo
+.type foo, @function
+foo:
+    ...
+    RET
+```
+
+#### Procedure Call Standards
+
+The Arm architecture places few restrictions on how general purpose registers are used. To recap, integer registers and floating-point registers are general purpose registers. However, if you want your code to interact with code that is written by someone else, or with code that is produced by a compiler, then you need to agree rules for register usage. For the Arm architecture, these rules are called the Procedure Call Standard, or PCS. This is commonly also known as "calling convention", required for ABI compliance.
+
+The PCS says that the first argument is passed in X0, the second argument in X1, and so on up to X7. Any further arguments are passed on the stack. Here is the table that shows caller- and callee-saved registers:
+
+| `X0` - `X7`                                  | `X8` - `X15` | `X16` - `X23` | `X24` - `X30` |
+| :------------------------------------------: | :----------: | :-----------: | :-----------: |
+| Parameter and Result Registers (`X0` - `X7`) | `XR` (`X8`)  | `IP0` (`X16`) | Callee-saved Registers (`X24` - `X28`) |
+|                      | Corruptible Registers (`X9` - `X15`) | `IP1` (`X17`) | `FP` (`X29`)  |
+|                                              |              | `PR` (`X18`)  | `LR` (`X30`)  |
+|                                  | | Callee-Saved Registers (`X19` - `X23`) |               |
+
+??? note "Some Registers Have Special Significance in the PCS"
+
+    - `XR`: indirect result register
+        - if `foo()` returned a `struct`, then the memory for `struct` would be allocated by the caller (`main()`)
+        - `XR` is a pointer to the memory allocated by the caller for returning the `struct`
+    - `IP0` and `IP1`: intra-procedure-call corruptible registers
+        - can be corrupted between the time that the function is called and the time that it arrives at the first instruction in the function
+        - used by linkers to insert veneers between the caller and callee
+        - veneers = small pieces of code; most common example is for branch range extension: the branch instruction in A64 has a limited range, if the target is beyond that range, then the linker needs to generate a veneer to extend the range of the branch
+    - `FP`: frame pointer
+    - `LR` (= `X30`): link register for function calls
+
+!!! info "The PCS says that the ALU flags do not need to be preserved across a function call."
+
+??? info "Floating Point Registers"
+
+    | `D0` - `D7` | `D8` - `D15` | `D16` - `D23` | `D24` - `D31` |
+    | :---------: | :----------: | :-----------: | :-----------: |
+    | Parameter and Result Registers (`D0` - `D7`) | Callee-saved Registers (`D8` - `D15`) | Callee-saved Registers (`D16` - `D31`) | Callee-saved Registers (`D16` - `D31`) |

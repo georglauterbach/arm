@@ -20,6 +20,7 @@ This documentation is a "meta-documentation" as it is based on other documentati
 6. [Arm Docs (LtA) - AArch64 Virtualization](https://developer.arm.com/documentation/102142/0100/Overview)
 7. [Arm Docs (LtA) - TrustZone for AArch64](https://developer.arm.com/documentation/102418/0101/Overview)
 8. [Arm Docs (LtA) - Memory Management](https://developer.arm.com/documentation/101811/0102/Overview)
+9. [Arm Docs (LtA) - ISA](https://developer.arm.com/documentation/102374/0101/Overview)
 
 ## CHERI
 

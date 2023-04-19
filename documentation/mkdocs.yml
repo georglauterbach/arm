@@ -1,7 +1,7 @@
-site_name: PTD | ARM
-site_description: Personal Technical Documentation about ARM
+site_name: Arm Meta-Documentation
+site_description: Meta-Documentation about Arm
 site_author: Georg Lauterbach (@georglauterbach)
-copyright: <p>&copy <a href="https://github.com/georglauterbach"><em>Georg Lauterbach</em></a><br/><span>This project is licensed under the GNU GENERAL PUBLIC LICENSE v3.</span></p>
+copyright: <p>&copy <a href="https://github.com/georglauterbach"><em>Georg Lauterbach</em></a><br/><span>This project is licensed under the GNU General Public License v3.</span></p>
 docs_dir: content/
 
 repo_name: arm
@@ -79,7 +79,6 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - Terminology: terminology.md
   - Introduction: introduction.md
   - Hardware:
     - hardware/index.md

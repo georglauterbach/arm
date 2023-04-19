@@ -35,7 +35,7 @@ Systems include more that just a processor core. ARM provides **specifications**
 Specifications are the **basis of software compatibility**. The system architecture consists of
 
 1. **Component Architecture Specification**
-    - first layer providing a common programmer's model to software through ISA compatibility
+    - first layer providing a common programmer's model (i.e. common instruction set & workflow) to software through ISA compatibility
 2. **System Architecture**, containing
     1. **Base System Architecture** (BSA)
         - describes a hardware system architecture that system software can rely on
@@ -43,7 +43,7 @@ Specifications are the **basis of software compatibility**. The system architect
         - provides reliable platform for standard OSs, hypervisors & firmware
         - applicable across different markets and use cases
         - other standards can build on BSA to provide market-specific standardization
-    2. **Base Boot Requirements** (BRR)
+    2. **Base Boot Requirements** (BBR)
         - establishes firmware interface requirements, e.g. PSCI, SMCCC, UEFI, ACPI, SMBIOS
         - covers requirements for systems based on the Arm architecture and that operating systems and hypervisors can rely on
         - provides the recipes for targeting specific use cases (point 3)
@@ -76,6 +76,16 @@ Profiles allow tailoring an architecture to different use cases while sharing se
 ### Extensions
 
 Development of major versions of the Arm architecture can take many years. Because the architecture needs to evolve between major versions to add new features, minor versions, called extensions, are added. There is now an annual release of a extension. The Arm Architecture Reference Manual provides information on which features are optional or mandatory in different versions of the Armv8.x-A and Armv9.x-A architectures. There is [a list on the ARM Developer Documentation][arm-dev-docs--extentions-list] that lists the most important extensions for ARMv8.x and ARMv9.x.
+
+??? example "Architecture, ISA, Version, Revision/Extension & More"
+
+    When using the term _ARMv9.2-A_, you imply that your are talking about
+
+    1. the Arm architecture
+    2. version 9
+    3. revision/extension 2
+    4. with profile A (Application)
+    5. that has the instruction set A64 (64bit)
 
 [arm-dev-docs--extentions-list]: https://developer.arm.com/documentation/102378/0201/Armv8-x-and-Armv9-x-extensions-and-features
 
@@ -141,6 +151,7 @@ There can be two security states:
 ### Execution States
 
 !!! abstract "Definition: Execution State"
+
     ~ defines the standard width of the general-purpose register and the available instruction sets. It also affects aspects of the memory model, execution model,  virtual memory system architecture (VMSA) and how exceptions are managed (exception model).
 
 On ARMv8 and ARMv9, two execution states are supported:
@@ -203,7 +214,7 @@ Physical interrupts include:
 
 In AArch64 specific terminology is used when talking about taking an exception:
 
-- When the PE responds to an exception, an exception is¢ taken.
+- When the Processing Element (PE, usually a processor core) responds to an exception, an exception is¢ taken.
 - The PE state immediately before taking the exception is the state the exception is taken from.
 - The PE state immediately after taking the exception is the state the exception is taken to.
 
@@ -218,7 +229,7 @@ After an exception has been handled, the system needs to return from the state i
 
 #### Taking an Exception
 
-When an exception occurs, the processor saves the current status of the PE alongside the exception return address, and then enters a specific mode to handle the exception. When an exception is taken to an Exception level (`ELx`) that is using AArch64 state, all of the following occur:
+When an exception occurs, the processor saves the current status of the PE alongside the exception return address, and then enters a specific mode to handle the exception. When an exception is taken to an Exception Level (`ELx`) that is using AArch64 state, all of the following occur:
 
 - The contents of `PSTATE` immediately before the exception was taken is written to `SPSR_ELx`.
 - The preferred exception return address is written to `ELR_ELx`.

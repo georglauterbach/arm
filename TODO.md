@@ -11,11 +11,6 @@
 
 ## Thesis TODO
 
-- provide convention for word styling
-    - smallcaps: proper nounds
-    - italics: technical, specialized terms
-    - bold:
-    - underline:
 - use SIUnitX for bit (and other units)
 - provide better introduction, including
     - motivation
@@ -23,19 +18,18 @@
 
 ## Reading List
 
-1. read up on the Arm architecture
-2. read section in `[1]` about implementation in ARMv8
-3. read `[2]` Architecture-Neutral Protection Model
-4. <https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/workshops/2016eurosys/>
-5. ASPLOS
+1. read section in `[1]` about implementation in ARMv8
+2. read `[2]` Architecture-Neutral Protection Model
+3. <https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/workshops/2016eurosys/>
+4. ASPLOS
     1. '21 CubicleOS
     2. '22 Introduction to CHERI
-6. OSDI
+5. OSDI
     1. '22 CAP-VMs: Cap-Based Isolation in the Cloud
-7. GitHub: Security Analysis of CHERI ISA by MSRC
-8. HUAWEI: System Partitions by Bohdan Trach
-9. <https://www.thegoodpenguin.co.uk/blog/introducing-arm-morello-cheri-architecture/>
-10. Morello
+6. GitHub: Security Analysis of CHERI ISA by MSRC
+7. HUAWEI: System Partitions by Bohdan Trach
+8. <https://www.thegoodpenguin.co.uk/blog/introducing-arm-morello-cheri-architecture/>
+9. Morello
     1. General: <https://www.arm.com/architecture/cpu/morello?#Guide>
     2. Development Platform and Software Getting Started Guide: <https://developer.arm.com/documentation/den0132/latest/>
     3. Prototype  Arch Overview: <https://developer.arm.com/documentation/den0133/0100/Morello-prototype-architecture>

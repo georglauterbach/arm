@@ -92,4 +92,4 @@ nav:
     - Technical Background: cheri/technical_background.md
     - Capabilities: cheri/capabilities.md
     - Consequences: cheri/consequences.md
-    - Sources: cheri/sources.md
+  - Sources: sources.md

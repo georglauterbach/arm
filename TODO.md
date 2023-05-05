@@ -1,35 +1,36 @@
 # TODOs
 
+## Tasks
+
+- motivate the thesis again
+- push to Huawei internal GitLab
+- stay focused!
+- explain whats needed for the next chapters in detail
+- provide references to papers for stuff that is interesting but unrelated
+
 ## Open Issues
 
-- KMP: why do you need _Kernel Memory Isolation_?
-- define _spatial_, _temporal_ & _referential_ safety/protection: - "In addition to imposing spatial protection (bounds and permission checks) and referential protection (integrity and provenance validity enforcement), CHERI can also be used to implement strong C/C++-language temporal memory safety." what does temporal mean here?
-- TCB is ever reoccurring
-- what is "capability-oblivious code"
 - provide more (improved, rigorous) definitions
-- note that we're using GAS syntax
+    - capability-oblivious code
+    - mem safety: see ISAv8 guide 2.4.2
+- define exactly what and where the TCB is
+- CubicleOS does not require extra support from the OS and compiler (unlike CHERI)
+- sentry = sealed entry
+- look again at jump-based invocation mechanism (unsealing just 1 cap)
+- rereads ARMv8-A Procedure Call Standard (calling convention)
+- add to sources: <https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/workshops/2016eurosys/>
+- maybe look at CheriFreeRTOS
+- bring order to "Download" dir and images on the home screen
 
-## Thesis TODO
-
-- use SIUnitX for bit (and other units)
-- provide better introduction, including
-    - motivation
-    - revised naming convention
+Devise structure for chapter "Technical Background"
 
 ## Reading List
 
-1. read section in `[1]` about implementation in ARMv8
-2. read `[2]` Architecture-Neutral Protection Model
-3. <https://www.cl.cam.ac.uk/research/security/ctsrd/cheri/workshops/2016eurosys/>
-4. ASPLOS
-    1. '21 CubicleOS
-    2. '22 Introduction to CHERI
-5. OSDI
-    1. '22 CAP-VMs: Cap-Based Isolation in the Cloud
-6. GitHub: Security Analysis of CHERI ISA by MSRC
-7. HUAWEI: System Partitions by Bohdan Trach
-8. <https://www.thegoodpenguin.co.uk/blog/introducing-arm-morello-cheri-architecture/>
-9. Morello
-    1. General: <https://www.arm.com/architecture/cpu/morello?#Guide>
-    2. Development Platform and Software Getting Started Guide: <https://developer.arm.com/documentation/den0132/latest/>
-    3. Prototype  Arch Overview: <https://developer.arm.com/documentation/den0133/0100/Morello-prototype-architecture>
+1. CHERI C/C++ Programming Guide
+2. <https://ctsrd-cheri.github.io/cheri-exercises/introduction/index.html>
+3. Morello
+    1. <https://www.thegoodpenguin.co.uk/blog/introducing-arm-morello-cheri-architecture/>
+    2. General: <https://www.arm.com/architecture/cpu/morello?#Guide>
+    3. Development Platform and Software Getting Started Guide: <https://developer.arm.com/documentation/den0132/latest/>
+    4. Prototype Arch Overview: <https://developer.arm.com/documentation/den0133/0100/Morello-prototype-architecture>
+    5. <https://www.arm.com/architecture/cpu/morello>

@@ -21,9 +21,3 @@ This documentation is a "meta-documentation" as it is based on other documentati
 7. [Arm Docs (LtA) - TrustZone for AArch64](https://developer.arm.com/documentation/102418/0101/Overview)
 8. [Arm Docs (LtA) - Memory Management](https://developer.arm.com/documentation/101811/0102/Overview)
 9. [Arm Docs (LtA) - ISA](https://developer.arm.com/documentation/102374/0101/Overview)
-
-## CHERI
-
-1. `[1]` "An Introduction to CHERI", University of Cambridge, <https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-941.pdf>
-2. `[2]` "Capability Hardware Enhanced RISC Instructions: CHERI Instruction-Set Architecture (Version 8)", University of Cambridge, <https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-951.pdf>
-3. `[3]` "CHERI: A Hybrid Capability-System Architecture for Scalable Software Compartmentalization", University of Cambridge, <https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7163016>
